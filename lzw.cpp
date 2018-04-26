@@ -5,7 +5,7 @@
 int main(int ac, char **av)
 {
 	lzw::lzwcodec<> lzwcd;
-	if (ac == 1) {
+	if (std::string(av[0]).find("lzw") != ~0u) {
 		lzw::default_symstream_reader dsr(std::cin);
 		lzw::default_code_writer dcw(std::cout);
 		lzw::default_sym_to_code dstc;
