@@ -22,25 +22,7 @@ namespace lzw {
 	};
 
 	struct hash_sym {
-		int32_t operator()(const sym_type &p) const {
-			// Basé sur FNV sauf que les xors se font sur plusieurs
-			// octets à la fois
-			unsigned rem = p.sz & 0x7;
-			size_t hash = 0xCBF29CE484222325;
-			long *ptr = (long*)p.data;
-			unsigned words = p.sz >> 3;
-			for (unsigned i = 0; i < words; ++i) {
-				hash *= 0x10000001B3;
-				hash ^= ptr[i];
-			}
-			ptr += words;
-			char *it = (char*)ptr;
-			for(unsigned i = 0; i < rem; ++i) {
-				hash *= 0x1000193;
-				hash ^= it[i];
-			}
-			return hash;
-		}
+		size_t operator()(const sym_type &p) const;
 	};
 
 	template <typename concatf = adder,
