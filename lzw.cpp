@@ -28,7 +28,7 @@ namespace lzw {
 int main(int ac, char **av)
 {
 	lzw::lzwcodec<> lzwcd;
-	if (std::string(av[0]).find("lzw") != ~0u) {
+	if (std::string(av[0]).find("lzwu") == std::string::npos) {
 		lzw::default_symstream_reader dsr(std::cin);
 		lzw::default_code_writer dcw(std::cout);
 		lzw::default_sym_to_code dstc;
