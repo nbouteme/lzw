@@ -6,7 +6,9 @@
 #include <algorithm>
 #include <string>
 #include <map>
+#include <unordered_map>
 #include "sym.h"
+#include "lzw.h"
 
 namespace lzw {
 	struct default_symbol_writer {
@@ -18,7 +20,7 @@ namespace lzw {
 			return os.good();
 		}
 
-		void write(const std::string &sym) {
+		void write(const sym_type &sym) {
 			os.write(sym.c_str(), sym.size());
 		}
 	};
@@ -40,11 +42,11 @@ namespace lzw {
 				size += is.read(buf + size, allocated - size).gcount();
 				if (is && size == allocated) {
 					allocated *= 2;
-					if(!realloc(buf, allocated))
+					if(!(buf = (char*)realloc(buf, allocated)))
 						abort();
 				}
 			}
-			if (size && !realloc(buf, size))
+			if (size && !(buf = (char*)realloc(buf, size)))
 				abort();
 			return buf;
 		}
@@ -68,18 +70,17 @@ namespace lzw {
 				}
 				syms.push_back(s);
 			}
+			free(in);
 		}
 
 		sym readcode() {
-			std::cerr << "Read symbol " << syms[i].v << std::endl;
 			return syms[i++];
 		}
 	};
 
-
 	struct default_code_to_sym {
-		std::map<std::string, unsigned> dict;
-		std::vector<std::string> rdict;
+		std::unordered_map<sym_type, unsigned, hash_sym> dict;
+		std::vector<sym_type> rdict;
 
 		bool exists(const sym &s) {
 			if (s.v <= 255)
@@ -88,19 +89,19 @@ namespace lzw {
 				rdict[(s.v - 255)] != "";
 		}
 
-		bool exists(const std::string &s) {
+		bool exists(const sym_type &s) {
 			if (s.size() <= 1)
 				return true;
 			return !!dict.count(s);
 		}
 
-		std::string get(const sym &s) {
+		sym_type get(const sym &s) {
 			if (s.v <= 255)
-				return std::string("") + (char)s.v;
+				return sym_type() + (char)s.v;
 			return rdict[s.v - 255];
 		}
 
-		void add(const std::string &s) {
+		void add(const sym_type &s) {
 			auto &ent = dict[s];
 			ent = dict.size() + 255;
 			rdict.resize(dict.size() + 1);
