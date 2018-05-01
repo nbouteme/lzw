@@ -45,7 +45,7 @@ namespace lzw {
 				  typename U,
 				  typename D>
 		void compress(T &input, U &output, D &dict) {
-			symbol w = "";
+			symbol w;
 			while (input) {
 				symbol c = input.readsym();
 				symbol p = concat(w, c);

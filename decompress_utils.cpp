@@ -56,7 +56,7 @@ namespace lzw {
 		}
 		s.read(idx, cptr, sz);
 		//ofs << s.v << " " << s.l << std::endl;
-		ofs << s.v << " " << s.l << " " << dcts.size() << std::endl;
+		//ofs << s.v << " " << s.l << " " << dcts.size() << std::endl;
 		++i;
 		return s;
 	}
@@ -69,7 +69,7 @@ namespace lzw {
 		if (s.v <= 255)
 			return true;
 		return rdict.size() > (s.v - 255) &&
-			rdict[(s.v - 255)] != "";
+			rdict[(s.v - 255)] != sym_type();
 	}
 
 	bool default_code_to_sym::exists(const sym_type &s) {

@@ -7,8 +7,12 @@
 #include <cstdlib>
 
 struct blob {
-	char *data;
+	union {
+		char *data;
+		char buf[256];
+	};
 	unsigned sz;
+	bool sso_enabled;
 
 	blob(const char *s);
 	blob(char s);

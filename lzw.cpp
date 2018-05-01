@@ -8,7 +8,7 @@ namespace lzw {
 		// octets à la fois
 		unsigned rem = p.sz & 0x7;
 		size_t hash = 0xCBF29CE484222325;
-		long *ptr = (long*)p.data;
+		long *ptr = (long*)p.c_str();
 		unsigned words = p.sz >> 3;
 		for (unsigned i = 0; i < words; ++i) {
 			hash *= 0x10000001B3;

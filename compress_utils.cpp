@@ -14,7 +14,7 @@ namespace lzw {
 
 	sym_type default_symstream_reader::readsym() {
 		if (!*this)
-			return "";
+			return sym_type();
 		char d = n;
 		os.read(&n, 1);
 		dead = !os;
@@ -40,7 +40,7 @@ namespace lzw {
 			max = (1 << s) - 1;
 		}
 		//ofs << code << " " << s << std::endl;
-		ofs << code << " " << s <<  " " << dstc.size() << std::endl;
+		//ofs << code << " " << s <<  " " << dstc.size() << std::endl;
 		syms.push_back({s, code});
 	}
 
@@ -67,7 +67,7 @@ namespace lzw {
 		if (s.v <= 255)
 			return true;
 		return rdict.size() > (s.v - 255) &&
-			rdict[(s.v - 255)] != "";
+			rdict[(s.v - 255)] != sym_type();
 	}
 
 	bool default_sym_to_code::exists(const sym_type &s) {
