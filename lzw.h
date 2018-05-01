@@ -52,8 +52,8 @@ namespace lzw {
 				if (dict.exists(p))
 					w = p;
 				else {
-					dict.add(p);
 					output.write(dict.get(w));
+					dict.add(p);
 					w = c;
 				}
 			}

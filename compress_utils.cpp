@@ -1,4 +1,5 @@
 #include "compress_utils.h"
+#include <fstream>
 
 namespace lzw {
 	default_symstream_reader::default_symstream_reader(std::istream &_os) :
@@ -20,8 +21,12 @@ namespace lzw {
 		return sym_type() + d;
 	}
 
-	default_code_writer::default_code_writer(std::ostream &_os) :
-		os(_os) {
+	default_code_writer::default_code_writer(std::ostream &_os,
+		default_sym_to_code &_dstc) :
+		os(_os),
+		dstc(_dstc),
+		ofs("compresslog") {
+		dstc.dcw = this;
 	}
 
 	default_code_writer::operator bool() const {
@@ -29,11 +34,13 @@ namespace lzw {
 	}
 
 	void default_code_writer::write(unsigned code) {
-		while (code >= max) {
-			syms.push_back({s, max});
+		while (dstc.size() >= max) {
+			//syms.push_back({s, max});
 			++s;
 			max = (1 << s) - 1;
 		}
+		//ofs << code << " " << s << std::endl;
+		ofs << code << " " << s <<  " " << dstc.size() << std::endl;
 		syms.push_back({s, code});
 	}
 
@@ -76,9 +83,25 @@ namespace lzw {
 	}
 
 	void default_sym_to_code::add(const sym_type &s) {
+		if (size() >= (1 << 16) - 2) {
+			clear();
+			if (dcw) {
+				dcw->s = 9;
+				dcw->max = (1 << dcw->s) - 1;
+			}
+		}
 		auto &ent = dict[s];
 		ent = dict.size() + 255;
 		rdict.resize(dict.size() + 1);
 		rdict[dict.size()] = s;
+	}
+
+	unsigned default_sym_to_code::size() {
+		return dict.size() + 255;
+	}
+
+	void default_sym_to_code::clear() {
+		dict.clear();
+		rdict.clear();
 	}
 }

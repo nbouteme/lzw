@@ -13,10 +13,10 @@ namespace lzw {
 	}
 
 	default_codestream_reader::operator bool() const {
-		return i < syms.size();
+		return i < nsyms;
 	}
 
-	char *default_codestream_reader::readstream(std::istream &is, unsigned &size) {
+	char *readstream(std::istream &is, unsigned &size) {
 		unsigned allocated = 4 * 1024 * 1024;
 		char *buf = (char*)malloc(allocated);
 		size = 0;
@@ -33,30 +33,36 @@ namespace lzw {
 		return buf;
 	}
 
-	default_codestream_reader::default_codestream_reader(std::istream &is) {
+	default_codestream_reader::default_codestream_reader(std::istream &_is,
+														 default_code_to_sym &_dcts) :
+		is(_is),
+		dcts(_dcts),
+		ofs("decomplog") {
 		unsigned size = 0;
-		char *in = readstream(is, size);
-		unsigned nsyms = *(unsigned *)in;
-		char *it = in + 4;
-		unsigned char idx = 0;
-		unsigned sz = 8;
-		while (syms.size() != nsyms) {
-			unsigned max = (1 << sz) - 1;
-			sym s;
-			s.read(idx, it, sz);
-			while (s.v == max) {
-				++sz;
-				nsyms--;
-				s.read(idx, it, sz);
-				max = (1 << sz) - 1;
-			}
-			syms.push_back(s);
-		}
-		free(in);
+		base = readstream(is, size);
+		nsyms = *(unsigned *)base;
+		cptr = base + 4;
 	}
 
 	sym default_codestream_reader::readcode() {
-		return syms[i++];
+		sym s;
+		unsigned max = (1 << sz) - 1;
+		if (dcts.size() + 1 >= max) {
+			++sz;
+		}
+		if (sz == 17) {
+			sz = 9;
+			dcts.clear();
+		}
+		s.read(idx, cptr, sz);
+		//ofs << s.v << " " << s.l << std::endl;
+		ofs << s.v << " " << s.l << " " << dcts.size() << std::endl;
+		++i;
+		return s;
+	}
+
+	default_codestream_reader::~default_codestream_reader() {
+		free(base);
 	}
 
 	bool default_code_to_sym::exists(const sym &s) {
@@ -76,6 +82,15 @@ namespace lzw {
 		if (s.v <= 255)
 			return sym_type() + (char)s.v;
 		return rdict[s.v - 255];
+	}
+
+	unsigned default_code_to_sym::size() {
+		return dict.size() + 255;
+	}
+
+	void default_code_to_sym::clear() {
+		dict.clear();
+		rdict.clear();
 	}
 
 	void default_code_to_sym::add(const sym_type &s) {
