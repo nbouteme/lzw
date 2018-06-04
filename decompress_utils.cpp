@@ -36,8 +36,7 @@ namespace lzw {
 	default_codestream_reader::default_codestream_reader(std::istream &_is,
 														 default_code_to_sym &_dcts) :
 		is(_is),
-		dcts(_dcts),
-		ofs("decomplog") {
+		dcts(_dcts) {
 		unsigned size = 0;
 		base = readstream(is, size);
 		nsyms = *(unsigned *)base;
@@ -55,8 +54,6 @@ namespace lzw {
 			dcts.clear();
 		}
 		s.read(idx, cptr, sz);
-		//ofs << s.v << " " << s.l << std::endl;
-		//ofs << s.v << " " << s.l << " " << dcts.size() << std::endl;
 		++i;
 		return s;
 	}

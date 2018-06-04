@@ -24,8 +24,7 @@ namespace lzw {
 	default_code_writer::default_code_writer(std::ostream &_os,
 		default_sym_to_code &_dstc) :
 		os(_os),
-		dstc(_dstc),
-		ofs("compresslog") {
+		dstc(_dstc) {
 		dstc.dcw = this;
 	}
 
@@ -39,8 +38,6 @@ namespace lzw {
 			++s;
 			max = (1 << s) - 1;
 		}
-		//ofs << code << " " << s << std::endl;
-		//ofs << code << " " << s <<  " " << dstc.size() << std::endl;
 		syms.push_back({s, code});
 	}
 

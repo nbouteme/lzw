@@ -34,7 +34,6 @@ namespace lzw {
 		// flemme
 		std::istream &is;
 		default_code_to_sym &dcts;
-		std::ofstream ofs;
 		std::vector<sym> syms;
 
 

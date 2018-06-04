@@ -40,7 +40,6 @@ namespace lzw {
 		std::vector<sym> syms;
 		std::ostream &os;
 		default_sym_to_code &dstc;
-		std::ofstream ofs;
 		int s = 8;
 		unsigned max = 255;
 
